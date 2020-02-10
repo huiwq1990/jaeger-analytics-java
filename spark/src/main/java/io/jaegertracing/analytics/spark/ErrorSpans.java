@@ -8,6 +8,7 @@ import io.jaegertracing.analytics.model.Span;
 import io.jaegertracing.analytics.model.Trace;
 import io.opentracing.tag.Tags;
 import io.prometheus.client.Counter;
+import lombok.Getter;
 import org.apache.tinkerpop.gremlin.structure.Graph;
 import org.apache.tinkerpop.gremlin.structure.Vertex;
 
@@ -29,7 +30,7 @@ public class ErrorSpans implements ModelRunner {
         Result ret = calculate(graph);
         if(ret != null && ret.errors != null && ret.errors.size() > 0){
             Map<String, Set<String>> group = ret.errors.stream().collect(
-                    Collectors.groupingBy(ErrorInfo::getEsType,
+                    Collectors.groupingBy(ErrorInfo::esType,
                             Collectors.mapping(tmp -> JSON.toJSONString(tmp), Collectors.toSet())
                     ));
             group.entrySet().forEach( tmp -> SparkEsConfig.write(tmp.getKey(), Lists.newArrayList(tmp.getValue())));
@@ -39,18 +40,24 @@ public class ErrorSpans implements ModelRunner {
     public static class Result {
         public List<ErrorInfo> errors = new ArrayList<>();
     }
+
+    @Getter
     public static class ErrorInfo{
         private String spanId;
         private String traceId;
         private long startTimeMicros;
+        private String serviceName;
+        private String operationName;
 
-        public ErrorInfo(String traceId, String spanId, long startTimeMicros){
-            this.traceId = traceId;
-            this.spanId =  spanId;
-            this.startTimeMicros = startTimeMicros;
+        public ErrorInfo(Span span){
+            this.traceId = span.traceId;
+            this.spanId =  span.spanId;
+            this.startTimeMicros = span.startTimeMicros;
+            this.serviceName = span.serviceName;
+            this.operationName = span.operationName;
         }
 
-        public String getEsType(){
+        public String esType(){
             TimeZone utcTZ= TimeZone.getTimeZone("UTC");
             Calendar utcCal= Calendar.getInstance(utcTZ);
             utcCal.setTimeInMillis(startTimeMicros/1000);
@@ -59,18 +66,6 @@ public class ErrorSpans implements ModelRunner {
             sdf.setTimeZone(utcTZ);
             Date utcDate= utcCal.getTime();
             return "jaeger-errorspan-" + sdf.format(utcDate) + "/errorspan";
-        }
-
-        public String getSpanId() {
-            return spanId;
-        }
-
-        public String getTraceId() {
-            return traceId;
-        }
-
-        public long getStartTimeMicros() {
-            return startTimeMicros;
         }
     }
 
@@ -84,7 +79,7 @@ public class ErrorSpans implements ModelRunner {
             if(Boolean.valueOf(errVal)){
                 counter.labels(span.serviceName)
                         .inc();
-                result.errors.add(new ErrorInfo(span.traceId,span.spanId,span.startTimeMicros));
+                result.errors.add(new ErrorInfo(span));
             }
         }
         return result;

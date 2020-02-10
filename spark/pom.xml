@@ -24,6 +24,11 @@
       <artifactId>spark-streaming_${version.scala}</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.10</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch-spark-20 -->
     <dependency>
       <groupId>org.elasticsearch</groupId>
