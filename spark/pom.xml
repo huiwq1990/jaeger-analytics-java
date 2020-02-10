@@ -23,6 +23,21 @@
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-streaming_${version.scala}</artifactId>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.elasticsearch/elasticsearch-spark-20 -->
+    <dependency>
+      <groupId>org.elasticsearch</groupId>
+      <artifactId>elasticsearch-spark-20_2.11</artifactId>
+      <version>5.6.10</version>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/com.alibaba/fastjson -->
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.62</version>
+    </dependency>
+
+
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-streaming-kafka-0-10_${version.scala}</artifactId>

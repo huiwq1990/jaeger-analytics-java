@@ -1,8 +1,8 @@
 package io.jaegertracing.analytics.model;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class Span implements Serializable {
     public String traceId;

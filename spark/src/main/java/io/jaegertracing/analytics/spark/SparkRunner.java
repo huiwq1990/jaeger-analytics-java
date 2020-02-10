@@ -91,6 +91,7 @@ public class SparkRunner {
         .build();
 
     List<ModelRunner> modelRunner = Arrays.asList(
+            new ErrorSpans(),
         new TraceHeight(),
         new ServiceHeight(),
         new NetworkLatency(),
